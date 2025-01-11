@@ -1,0 +1,34 @@
+//@version=5
+indicator("Short-Term Scanner (Minimal Signals)", overlay=true)
+
+// EMA Settings
+ema9 = ta.ema(close, 9)
+ema21 = ta.ema(close, 21)
+
+// Volume Condition (Higher than 20-period average)
+vol_condition = volume > ta.sma(volume, 20)
+
+// Price Breakout Condition for Long (Close above EMAs)
+breakout_long = close > ema9 and close > ema21
+
+// Momentum Candle Condition (Body size > 1.2 * ATR)
+body_size = math.abs(close - open)
+momentum_long = body_size > (ta.atr(14) * 1.2)
+
+// Long Signal (Combining Conditions for Buy)
+long_signal = breakout_long and vol_condition and momentum_long
+
+// Sell Signal (Opposite of Long Signal)
+breakout_short = close < ema9 and close < ema21
+momentum_short = body_size > (ta.atr(14) * 1.2)
+short_signal = breakout_short and vol_condition and momentum_short
+
+// Plot Buy Signals
+plotshape(series=long_signal, location=location.belowbar, color=color.new(color.green, 0), style=shape.circle, size=size.tiny, title="Buy Signal")
+
+// Plot Sell Signals
+plotshape(series=short_signal, location=location.abovebar, color=color.new(color.red, 0), style=shape.circle, size=size.tiny, title="Sell Signal")
+
+// Plot EMAs
+plot(ema9, color=color.blue, title="EMA 9")
+plot(ema21, color=color.red, title="EMA 21")
